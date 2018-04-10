@@ -1,0 +1,100 @@
+{% load static %}
+<html>
+<head>
+
+	<link rel= "stylesheet" type="text/css" href="/static/css/bootstrap.css" >
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="search-filter.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+</head>
+<body>
+<div class="container">
+<h1>Search</h1>
+<form method="post" action="/search/">
+    {% csrf_token %}
+
+
+{#        <div class="form-group">#}
+{#            <div class="col-lg-5">#}
+{#                <input type="text" name="srh" class="form-control" placeholder="Enter search">#}
+{#            </div>#}
+{#            <label class="col-lg-2">#}
+{#                <button type="submit" class="btn btn-danger">Search</button>#}
+{#            </label>#}
+{#        </div>#}
+
+
+    <div class="container">
+      <div class="row searchFilter" >
+         <div class="col-sm-12" >
+          <div class="input-group" >
+           <input id="table_filter" type="text"  name="srh" class="form-control" aria-label="Text input with segmented button dropdown" placeholder="Enter search">
+           <div class="input-group-btn" >
+            <button type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" ><span class="label-icon" >Category</span> <span class="caret" >&nbsp;</span></button>
+            <div class="dropdown-menu dropdown-menu-right" >
+               <ul class="category_filters" >
+                <li >
+                 <input class="cat_type category-input" data-label="All" id="all" value="" name="radios" type="radio" ><label for="all" >All</label>
+                </li>
+                <li >
+                 <input type="radio" name="radios" id="Environmental Hazards" value="Environmental Hazards" ><label class="category-label" for="Environmental Hazards" >Environmental Hazards</label>
+                </li>
+                <li >
+                 <input type="radio" name="radios" id="Trash mismanaged" value="Trash mismanaged" ><label class="category-label" for="Trash mismanaged" >Trash mismanaged</label>
+               </ul>
+            </div>
+            <button id="searchBtn" type="submit" class="btn btn-danger" ><span class="glyphicon glyphicon-search" >&nbsp;</span> <span class="label-icon" >Search</span></button>
+           </div>
+          </div>
+         </div>
+      </div>
+    </div>
+
+
+
+</form><br><br>
+<div>
+{% if messages %}
+    <ul class="messages">
+    {% for k in messages %}
+    <li style="color: red">{{ k }}</li>
+    {% endfor %}
+    </ul>
+    {% endif %}
+</div><br>
+<div style="color: green">
+    {% if obj1 %}
+        {% for i in obj1 %}
+        <table border="1px" width="200px">
+            <tr>
+               <td>{{i.title}}</td>
+            </tr>
+
+            <tr>
+
+                <td>{{i.description}}</td>
+            </tr>
+
+            <tr>
+                <td>{{i.zipcode}}</td>
+            </tr>
+
+            <tr>
+                <td>{{i.published_date}}</td>
+            </tr>
+
+         <img src="{{ i.image.url }}"/>
+            <br><br><br>
+
+        </table>
+    <hr>
+        {% endfor %}
+    {% endif %}
+</div>
+</div>
+</body>
+</html>
+
+
