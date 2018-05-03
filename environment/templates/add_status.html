@@ -1,0 +1,24 @@
+{% extends 'index.html' %}
+
+{% block content %}
+    <div class="id" style="color: green" >
+        <h1>Edit Status</h1>
+
+        <form id="status_form" method="post" action="add_status/">
+
+            {% csrf_token %}
+            {% for hidden in form.hidden_fields %}
+                {{ hidden }}
+            {% endfor %}
+
+            {% for field in form.visible_fields %}
+                {{ field.errors }}
+                {{ field.help_text }}
+                {{ field }}
+            {% endfor %}
+
+            <input type="submit" name="submit" value="Change Category" />
+        </form>
+    </div>
+
+{% endblock %}

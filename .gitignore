@@ -1,0 +1,5 @@
+website/environment/static/images/images
+db.sqlite3
+.idea/
+environment/static/images/images/*.jpg
+environment/static/images/images/*.png
