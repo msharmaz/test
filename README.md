@@ -1,0 +1,2 @@
+# test
+list detail page
