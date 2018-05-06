@@ -1,2 +1,1 @@
-# test
-list detail page
+#list detail page
