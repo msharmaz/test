@@ -1,2 +1,0 @@
-# test
-list detail page
