@@ -17,6 +17,7 @@ from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
+from django.contrib.admin.views.decorators import staff_member_required
 
 
 # Create your views here.
@@ -95,6 +96,7 @@ def category_create(request):
     return render(request, 'create_category.html', {})
 
 
+@staff_member_required
 def add_status(request):
     # Get the context from the request.
     context = RequestContext(request)
@@ -123,6 +125,7 @@ def add_status(request):
     return render(request, 'add_status.html', {'form': form}, context)
 
 
+@staff_member_required
 def add_category(request):
     # Get the context from the request.
     context = RequestContext(request)

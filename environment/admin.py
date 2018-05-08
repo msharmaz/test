@@ -6,34 +6,29 @@ from django.contrib.sites.models import Site
 
 # Register your models here.
 
+from models import Post, Status
+
 import models
 
-
-admin.site.register(models.Status)
-admin.site.register(models.Post)
 admin.site.register(models.Category)
 admin.site.register(models.UserProfile)
 
-# To create in the search by admin
-# import
-#
-#
-# class UserAdmin(admin.ModelAdmin):
-#     # exclude = ('slug',)
-#     list_display = ('first_name', 'last_name', 'email',)
-#     list_filter = ('user_id',)
-#     search_fields = ('first_name', 'last_name')
-#
-#
-# admin.site.register(User, UserAdmin)
-#
-#
-# class PostAdmin(admin.ModelAdmin):
-#     # exclude = ('slug',)
-#     list_display = ('title', 'description', 'date',)
-#     list_filter = ('city',)  # can be date
-#     search_fields = ('city', 'title')
-#
-#
-# admin.site.register(Post, UserAdmin)
+
+class PostAdmin(admin.ModelAdmin):
+    list_display = ('title', 'description', 'date', 'category', 'city', 'state', 'date')
+    list_filter = ( 'category', 'city', 'date')
+    search_fields = ('city', 'title')
+
+
+admin.site.register(Post, PostAdmin)
+
+
+class StatusAdmin(admin.ModelAdmin):
+    list_display = ('post', 'status')
+    list_filter = ('post', 'status')
+    search_fields = ('post', 'status')
+
+
+admin.site.register(Status, StatusAdmin)
+
 
