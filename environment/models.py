@@ -46,7 +46,7 @@ class Status(models.Model):
         ('Unresolved', 'Unresolved'),
         ('In Progress', 'Inprogress'),
     )
-    post = models.ForeignKey(Post)
+    post = models.OneToOneField(Post, unique=True)
     status = models.CharField(max_length=15, default='Unresolved', choices=STATUS_CHOICES)
 
     def __str__(self):

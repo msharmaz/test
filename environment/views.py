@@ -22,14 +22,133 @@ from django.contrib.auth import logout
 # Create your views here.
 
 
-def home(request):
+def home(request):  # pk
     obj = Post.objects.all().order_by('-date')
+    # status = get_object_or_404(Status, post=pk)
     return render(request, 'index.html', {'obj': obj})
+    # ,'status': status})
 
 
 def citymanager(request):
     obj = Status.objects.all()
     return render(request, 'citymanager.html', {'obj': obj})
+
+
+@login_required
+def post_create(request):
+    """
+    View for creating a new post.
+    """
+    if request.method == 'POST':
+        # form is sent
+        post_form = PostForm(data=request.POST, files=request.FILES)
+        if post_form.is_valid():
+            cd = post_form.cleaned_data
+            new_item = post_form.save(commit=False)
+            # assign current user to the item
+            new_item.user = request.user
+            # tags = post_form.cleaned_data['tags']
+            new_item.save()
+            # for tag in tags:
+            #     new_item.tags.add(tag)
+            # new_item.save()
+            # create_action(request.user, 'created a post:', new_item)
+            messages.success(request, 'Post added successfully')
+            post_form = PostForm()
+        else:
+            messages.error(request, 'Error adding new post')
+
+    else:
+        # build form
+        post_form = PostForm(data=request.GET)
+
+    return render(request, 'create_post.html', {'section': 'posts',
+                                                'post_form': post_form})
+
+
+@login_required
+def post_remove(request, post_zipcode):
+    Post.objects.filter(id=post_zipcode).delete()
+    return redirect('posts:mypost')
+
+
+@login_required
+def post_edit(request, post_zipcode):
+    item = Post.objects.get(pk=post_zipcode)
+    if request.method == 'POST':
+        form = PostCreateForm(request.POST, instance=item)
+        if form.is_valid():
+            form.save()
+            return redirect('posts:mypost')
+
+    else:
+        form = PostCreateForm(instance=item)
+
+    args = {}
+    args.update(csrf(request))
+    args['form'] = form
+
+    return render_to_response('posts/post/post_edit.html', args)
+
+
+def category_create(request):
+    return render(request, 'create_category.html', {})
+
+
+def add_status(request):
+    # Get the context from the request.
+    context = RequestContext(request)
+
+    # A HTTP POST?
+    if request.method == 'POST':
+        form = StatusForm(request.POST)
+
+        # Have we been provided with a valid form?
+        if form.is_valid():
+            # Save the new category to the database.
+            form.save(commit=True)
+
+            # Now call the index() view.
+            # The user will be shown the homepage.
+            return home(request)
+        else:
+            # The supplied form contained errors - just print them to the terminal.
+            print form.errors
+    else:
+        # If the request was not a POST, display the form to enter details.
+        form = StatusForm()
+
+    # Bad form (or form details), no form supplied...
+    # Render the form with error messages (if any).
+    return render(request, 'add_status.html', {'form': form}, context)
+
+
+def add_category(request):
+    # Get the context from the request.
+    context = RequestContext(request)
+
+    # A HTTP POST?
+    if request.method == 'POST':
+        category_form = CategoryForm(request.POST)
+
+        # Have we been provided with a valid form?
+        if category_form.is_valid():
+            # Save the new category to the database.
+            category_form.save(commit=True)
+
+            # Now call the index() view.
+            # The user will be shown the homepage.
+            return home(request)
+        else:
+            # The supplied form contained errors - just print them to the terminal.
+            print category_form.errors
+    else:
+        # If the request was not a POST, display the form to enter details.
+        category_form = CategoryForm()
+
+    # Bad form (or form details), no form supplied...
+    # Render the form with error messages (if any).
+    return render(request, 'add_category.html', {'category_form': category_form}, context)
 
 
 def register(request):
@@ -149,123 +268,6 @@ def user_logout(request):
     return HttpResponseRedirect('/')
 
 
-@login_required
-def post_create(request):
-    """
-    View for creating a new post.
-    """
-    if request.method == 'POST':
-        # form is sent
-        post_form = PostForm(data=request.POST, files=request.FILES)
-        if post_form.is_valid():
-            cd = post_form.cleaned_data
-            new_item = post_form.save(commit=False)
-            # assign current user to the item
-            new_item.user = request.user
-            # tags = post_form.cleaned_data['tags']
-            new_item.save()
-            # for tag in tags:
-            #     new_item.tags.add(tag)
-            # new_item.save()
-            # create_action(request.user, 'created a post:', new_item)
-            messages.success(request, 'Post added successfully')
-            post_form = PostForm()
-        else:
-            messages.error(request, 'Error adding new post')
-
-    else:
-        # build form
-        post_form = PostForm(data=request.GET)
-
-    return render(request, 'create_post.html', {'section': 'posts',
-                                                'post_form': post_form})
-
-
-@login_required
-def post_remove(request, post_id):
-    Post.objects.filter(id=post_id).delete()
-    return redirect('posts:mypost')
-
-
-@login_required
-def post_edit(request, post_id):
-    item = Post.objects.get(pk=post_id)
-    if request.method == 'POST':
-        form = PostCreateForm(request.POST, instance=item)
-        if form.is_valid():
-            form.save()
-            return redirect('posts:mypost')
-
-    else:
-        form = PostCreateForm(instance=item)
-
-    args = {}
-    args.update(csrf(request))
-    args['form'] = form
-
-    return render_to_response('posts/post/post_edit.html', args)
-
-
-def category_create(request):
-    return render(request, 'create_category.html', {})
-
-
-def add_status(request):
-    # Get the context from the request.
-    context = RequestContext(request)
-
-    # A HTTP POST?
-    if request.method == 'POST':
-        form = StatusForm(request.POST)
-
-        # Have we been provided with a valid form?
-        if form.is_valid():
-            # Save the new category to the database.
-            form.save(commit=True)
-
-            # Now call the index() view.
-            # The user will be shown the homepage.
-            return index(request)
-        else:
-            # The supplied form contained errors - just print them to the terminal.
-            print form.errors
-    else:
-        # If the request was not a POST, display the form to enter details.
-        form = StatusForm()
-
-    # Bad form (or form details), no form supplied...
-    # Render the form with error messages (if any).
-    return render_to_response('add_status.html', {'form': form}, context)
-
-
-def add_category(request):
-    # Get the context from the request.
-    context = RequestContext(request)
-
-    # A HTTP POST?
-    if request.method == 'POST':
-        form = CategoryForm(request.POST)
-
-        # Have we been provided with a valid form?
-        if form.is_valid():
-            # Save the new category to the database.
-            form.save(commit=True)
-
-            # Now call the index() view.
-            # The user will be shown the homepage.
-            return index(request)
-        else:
-            # The supplied form contained errors - just print them to the terminal.
-            print form.errors
-    else:
-        # If the request was not a POST, display the form to enter details.
-        form = CategoryForm()
-
-    # Bad form (or form details), no form supplied...
-    # Render the form with error messages (if any).
-    return render_to_response('add_category.html', {'form': form}, context)
-
-
 def search(request):
     if request.method == 'POST':
         # if 'dropdown' in request.POST:
@@ -303,12 +305,12 @@ def post_detail(request, pk):
     template = 'post_detail.html'
 
     post = get_object_or_404(Post, pk=pk)
+    status = get_object_or_404(Status, post=pk)
     context = {
         'post': post,
+        'status': status
     }
     return render(request, template, context)
-
-
 
 # def search(request):
 #     # obj1 = Post.objects.all().order_by('published_date')

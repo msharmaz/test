@@ -32,6 +32,6 @@ urlpatterns = [
     url(r'^remove/(?P<post_id>\d+)/$', views.post_remove, name='post_remove'),
     url(r'^edit/(?P<post_id>\d+)/$', views.post_edit, name='post_edit'),
     url(r'^add_category/$', views.add_category, name='add_category'),  # NEW MAPPING!
-    url(r'^edit_status/$', views.add_status, name='edit_status'),  # NEW MAPPING!
+    url(r'^add_status/$', views.add_status, name='add_status'),  # NEW MAPPING!
     # url(r'^category/(?P<category_name_url>\w+)$', views.category, name='category'),
 ]

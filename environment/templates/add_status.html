@@ -4,7 +4,7 @@
     <div class="id" style="color: green" >
         <h1>Edit Status</h1>
 
-        <form id="status_form" method="post" action="add_status/">
+        <form id="form" method="post" />
 
             {% csrf_token %}
             {% for hidden in form.hidden_fields %}
