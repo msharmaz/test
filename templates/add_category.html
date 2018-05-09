@@ -1,0 +1,24 @@
+{% extends 'index.html' %}
+
+{% block content %}
+    <div class="id" style="color: green" >
+        <h1>Add a Category</h1>
+
+        <form id="category_form" method="post" enctype="multipart/form-data" xmlns="http://www.w3.org/1999/html">
+            {% csrf_token %}
+
+            {% for hidden in category_form.hidden_fields %}
+                {{ hidden }}
+            {% endfor %}
+
+            {% for field in category_form.visible_fields %}
+                {{ field.errors }}
+                {{ field.help_text }}
+                {{ field }}
+            {% endfor %}
+
+            <input type="submit" name="submit" value="Create Category" />
+        </form>
+    </div>
+
+{% endblock %}

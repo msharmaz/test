@@ -1,0 +1,37 @@
+{% extends "index.html" %}
+{% load static %}
+
+{% block content %}
+
+{% if messages %}
+    <ul class="messages">
+    {% for k in messages %}
+    <li style="color: red">{{ k }}</li>
+    {% endfor %}
+    </ul>
+    {% endif %}
+</div><br>
+
+
+<div class="id" style="color: green" >
+    {% if obj1 %}
+        {% for i in obj1 %}
+        <table border="1px" width="200px">
+                {{ i.title }}<br>
+                {{ i.description }}<br>
+                {{ i.category_id }}<br>
+                {{ user }}<br>
+                {{ i.city }}<br>
+                {{ i.state }}<br>
+                {{i.zipcode}}<br>
+            <img src="{{ i.image.url_125x125 }}" /><br>
+                    {{ i.user }}<br>
+         <img src="{{ i.image.url }}"/>
+            <br><br><br>
+        </table>
+    <hr>
+        {% endfor %}
+    {% endif %}
+</div>
+
+{% endblock %}

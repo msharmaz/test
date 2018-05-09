@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <a href="/">Home</a><br/>
+</head>
+<body>
+    <div class="id" >
+        {% if obj %}
+        {% for k in obj %}
+          <table>
+            <tr>
+            <td width="50">{{ k.id }}</td>
+                <td width="150">{{ k.status }}</td>
+                <td > {{ k.post }}</td>
+            </tr><br>
+        {% endfor %}
+        </table>
+        {% endif %}
+    </div>
+</body>
+</html>
