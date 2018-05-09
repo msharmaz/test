@@ -17,22 +17,23 @@ from django.conf.urls import url, include
 from django.contrib import admin
 from . import views
 
-
 urlpatterns = [
     url(r'^$', views.home, name='home'),
-    # url(r'^index/$', home),
+    url(r'^citymanager/$', views.citymanager, name='citymanager'),
     url(r'^search/$', views.search),
     url(r'^register/$', views.register, name='register'),  # ADD NEW PATTERN!
-    url(r'^login/$', views.user_login, name='login'), #added new
-    url(r'^restricted/', views.restricted, name='restricted'), #added
-    url(r'^logout/$', views.user_logout, name='logout'), #added
+    url(r'^login/$', views.user_login, name='login'),  # added new
+    # url(r'^restricted/', views.restricted, name='restricted'),  # added
+    url(r'^logout/$', views.user_logout, name='logout'),  # added
+    url(r'^(?P<pk>\d+)/$', views.post_detail, name='post_detail'),  # added
+    url(r'^create/$', views.post_create, name='create'),  # added for create post
 
-    #added for create post
-    url(r'^create/$', views.post_create, name='create'),
-    url(r'^category/$', views.category_create, name='category'),
-    url(r'^remove/(?P<post_id>\d+)/$', views.post_remove, name='post_remove'),
-    url(r'^edit/(?P<post_id>\d+)/$', views.post_edit, name='post_edit'),
-    # this two url is for detail view not working april 10
-    # url(r'^<slug:slug>/', post_detail.as_view(), name='blog_detail'),  # function base
-    # url(r'^/$', views.post_detail, name='blog_detail'),  # function base
+    # url(r'^category/$', views.category_create, name='category'),
+    # url(r'^remove/(?P<post_id>\d+)/$', views.post_remove, name='post_remove'),
+    # url(r'^edit/(?P<post_id>\d+)/$', views.post_edit, name='post_edit'),
+    url(r'^add_category/$', views.add_category, name='add_category'),  # NEW MAPPING!
+    # url(r'^add_status/$', views.add_status, name='add_status'),  # NEW MAPPING!
+    # url(r'^category/(?P<category_name_url>\w+)$', views.category, name='category'),
+    url(r'^edit-post/(?P<pk>\d+)/$', views.edit_post, name='edit_post'),
+    url(r'^post-list/$', views.post_list_admin, name='post_list_admin'),
 ]

@@ -2,29 +2,89 @@
 from __future__ import unicode_literals
 from django.shortcuts import render, get_object_or_404
 from .models import *
-from django.http import *
 from django.db.models import Q
 from django.contrib import messages
-from django.core.exceptions import ObjectDoesNotExist
-from django.contrib.auth.models import User
-from django.views.generic.list import ListView
-from django.views.generic.detail import DetailView
-
-from environment.forms import UserForm, UserProfileForm, PostForm
+from environment.forms import UserForm, UserProfileForm, PostForm, CategoryForm
 from django.template import RequestContext
-from django.shortcuts import render_to_response
 from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
+from django.contrib.admin.views.decorators import staff_member_required
 
 
 # Create your views here.
 
 
-def home(request):
-    obj = Post.objects.all().order_by('-published_date')
+def home(request):  # pk
+    obj = Post.objects.all().order_by('-date')
     return render(request, 'index.html', {'obj': obj})
+
+
+def citymanager(request):
+    obj = Status.objects.all()
+    return render(request, 'citymanager.html', {'obj': obj})
+
+
+@login_required
+def post_create(request):
+    """
+    View for creating a new post.
+    """
+    if request.method == 'POST':
+        # form is sent
+        post_form = PostForm(data=request.POST, files=request.FILES)
+        if post_form.is_valid():
+            # cd = post_form.cleaned_data
+            new_item = post_form.save(commit=False)
+            # assign current user to the item
+            new_item.user = request.user
+            # tags = post_form.cleaned_data['tags']
+            new_item.save()
+            # for tag in tags:
+            #     new_item.tags.add(tag)
+            # new_item.save()
+            # create_action(request.user, 'created a post:', new_item)
+            messages.success(request, 'Post added successfully')
+            post_form = PostForm()
+        else:
+            messages.error(request, 'Error adding new post')
+
+    else:
+        # build form
+        post_form = PostForm(data=request.GET)
+
+    return render(request, 'create_post.html', {'section': 'posts',
+                                                'post_form': post_form})
+
+
+@staff_member_required
+def add_category(request):
+    # Get the context from the request.
+    context = RequestContext(request)
+
+    # A HTTP POST?
+    if request.method == 'POST':
+        category_form = CategoryForm(request.POST)
+
+        # Have we been provided with a valid form?
+        if category_form.is_valid():
+            # Save the new category to the database.
+            category_form.save(commit=True)
+
+            # Now call the index() view.
+            # The user will be shown the homepage.
+            return home(request)
+        else:
+            # The supplied form contained errors - just print them to the terminal.
+            print category_form.errors
+    else:
+        # If the request was not a POST, display the form to enter details.
+        category_form = CategoryForm()
+
+    # Bad form (or form details), no form supplied...
+    # Render the form with error messages (if any).
+    return render(request, 'add_category.html', {'category_form': category_form}, context)
 
 
 def register(request):
@@ -115,7 +175,7 @@ def user_login(request):
                 return HttpResponseRedirect('/')
             else:
                 # An inactive account was used - no logging in!
-                return HttpResponse("Your Rango account is disabled.")
+                return HttpResponse("Your account is disabled.")
         else:
             # Bad login details were provided. So we can't log the user in.
             print "Invalid login details: {0}, {1}".format(username, password)
@@ -129,11 +189,6 @@ def user_login(request):
         return render(request, 'login.html', {}, context)
 
 
-@login_required
-def restricted(request):
-    return HttpResponse("Since you're logged in, you can see this text!")
-
-
 # Use the login_required() decorator to ensure only those logged in can access the view.
 @login_required
 def user_logout(request):
@@ -142,67 +197,6 @@ def user_logout(request):
 
     # Take the user back to the homepage.
     return HttpResponseRedirect('/')
-
-
-@login_required
-def post_create(request):
-    """
-    View for creating a new post.
-    """
-    if request.method == 'POST':
-        # form is sent
-        post_form = PostForm(data=request.POST, files=request.FILES)
-        if post_form.is_valid():
-            cd = post_form.cleaned_data
-            new_item = post_form.save(commit=False)
-            # assign current user to the item
-            new_item.user = request.user
-            # tags = post_form.cleaned_data['tags']
-            new_item.save()
-            # for tag in tags:
-            #     new_item.tags.add(tag)
-            # new_item.save()
-            # create_action(request.user, 'created a post:', new_item)
-            messages.success(request, 'Post added successfully')
-            post_form = PostForm()
-        else:
-            messages.error(request, 'Error adding new post')
-
-    else:
-        # build form
-        post_form = PostForm(data=request.GET)
-
-    return render(request, 'create_post.html', {'section': 'posts',
-                                                'post_form': post_form})
-
-
-@login_required
-def post_remove(request, post_id):
-    Post.objects.filter(id=post_id).delete()
-    return redirect('posts:mypost')
-
-
-@login_required
-def post_edit(request, post_id):
-    item = Post.objects.get(pk=post_id)
-    if request.method == 'POST':
-        form = PostCreateForm(request.POST, instance=item)
-        if form.is_valid():
-            form.save()
-            return redirect('posts:mypost')
-
-    else:
-        form = PostCreateForm(instance=item)
-
-    args = {}
-    args.update(csrf(request))
-    args['form'] = form
-
-    return render_to_response('posts/post/post_edit.html', args)
-
-
-def category_create(request):
-    return render(request, 'create_category.html', {})
 
 
 def search(request):
@@ -237,6 +231,141 @@ def search(request):
 
     return render(request, 'search.html')
 
+
+def post_detail(request, pk):
+    template = 'post_detail.html'
+
+    post = get_object_or_404(Post, pk=pk)
+    status = get_object_or_404(Status, post=pk)
+    context = {
+        'post': post,
+        'status': status
+    }
+    return render(request, template, context)
+
+
+@staff_member_required()
+def edit_post(request, pk):
+    template = 'create_post.html'
+    post = get_object_or_404(Post, pk=pk)
+
+    if request.method == 'POST':
+        post_form = PostForm(request.POST, instance=post)
+
+        try:
+            if post_form.is_valid():
+                post_form.save()
+                messages.success(request, "Post Was Successfully Updated")
+
+        except Exception as e:
+            messages.warning(request, 'Post Was Not Saved Due To An Error: {}'.format(e))
+
+    else:
+        post_form = PostForm(instance=post)
+
+    context = {
+        'post_form': post_form,
+        'post': post,
+    }
+    return render(request, template, context)
+
+
+@staff_member_required()
+def post_list_admin(request):
+    template = 'post_list_admin.html'
+
+    post = Post.objects.all()
+
+    # pages = pagination(request, post, 5)
+
+    context = {
+        # 'items': pages[0],
+        # 'page_range': pages[1]
+        'post': post
+    }
+    return render(request, template, context)
+
+
+# def category_create(request):
+#     return render(request, 'create_category.html', {})
+
+
+# @login_required
+# def post_remove(request, post_zipcode):
+#     Post.objects.filter(id=post_zipcode).delete()
+#     return redirect('posts:mypost')
+
+
+# @login_required
+# def post_edit(request, post_zipcode):
+#     item = Post.objects.get(pk=post_zipcode)
+#     if request.method == 'POST':
+#         form = PostCreateForm(request.POST, instance=item)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('posts:mypost')
+#
+#     else:
+#         form = PostCreateForm(instance=item)
+#
+#     args = {}
+#     args.update(csrf(request))
+#     args['form'] = form
+#
+#     return render_to_response('posts/post/post_edit.html', args)
+
+
+# @staff_member_required
+# def add_status(request):
+#     # Get the context from the request.
+#     context = RequestContext(request)
+#
+#     # A HTTP POST?
+#     if request.method == 'POST':
+#         form = StatusForm(request.POST)
+#
+#         # Have we been provided with a valid form?
+#         if form.is_valid():
+#             # Save the new category to the database.
+#             form.save(commit=True)
+#
+#             # Now call the index() view.
+#             # The user will be shown the homepage.
+#             return home(request)
+#         else:
+#             # The supplied form contained errors - just print them to the terminal.
+#             print form.errors
+#     else:
+#         # If the request was not a POST, display the form to enter details.
+#         form = StatusForm()
+#
+#     # Bad form (or form details), no form supplied...
+#     # Render the form with error messages (if any).
+#     return render(request, 'add_status.html', {'form': form}, context)
+
+
+# @login_required
+# def post_create(request):
+#     template = 'create_post.html'
+#     post_form = PostForm(data=request.POST, files=request.FILES)
+#
+#     try:
+#         if post_form.is_valid():
+#             post_form.save()
+#             messages.success(request, 'Your Post Was Successfully Saved')
+#         else:
+#             post_form = PostForm()
+#
+#     except Exception as e:
+#         messages.warning(request, "Post Failed To Save. Error: {}".format(e))
+#
+#     context = {
+#         'post_form': post_form,
+#     }
+#
+#     return render(request, template, context)
+
+
 # def search(request):
 #     # obj1 = Post.objects.all().order_by('published_date')
 # 	#some_category = Category.objects.get(category_name="SOMETHING")
@@ -258,11 +387,16 @@ def search(request):
 #     return render(request, 'search.html')
 
 
-# class based and function based deatil view page not working april 10
-# def post_detail(request):
-#     template = 'post_detail.html'
+# @login_required
+# def restricted(request):
+#     return HttpResponse("Since you're logged in, you can see this text!")
 
-#     post = get_object_or_404(Post)
+
+# class based and function based deatil view page not working april 10
+# def post_detail(request, pk=None):
+#     template = 'post_detail.html'
+#
+#     post = get_object_or_404(Post, pk=pk)
 #     context = {
 #         'post': post,
 #     }
@@ -270,9 +404,9 @@ def search(request):
 
 
 # class post_detail(DetailView):
-
+#
 #     model = Post
-
+#
 #     def get_context_data(self, **kwargs):
 #             context = super().get_context_data(**kwargs)
 #             return context

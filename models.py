@@ -17,13 +17,22 @@ class Category(models.Model):
         return self.type
 
 
-class Post(models.Model):
+class Status(models.Model):
     STATUS_CHOICES = (
         ('Resolved', 'Resolved'),
         ('Unresolved', 'Unresolved'),
+        ('In Progress', 'Inprogress'),
     )
+    status = models.CharField(max_length=15, primary_key= True, default='Unresolved', choices=STATUS_CHOICES)
+
+    def __str__(self):
+        return self.status
+
+
+class Post(models.Model):
     user = models.ForeignKey(User)
-    category = models.ForeignKey(Category)
+    category = models.ForeignKey(Category, default='Unresolved')
+    status = models.ForeignKey(Status, )
     title = models.CharField(max_length=50)
     description = models.TextField()
     city = models.CharField(max_length=45, blank=True, null=True)
@@ -32,12 +41,12 @@ class Post(models.Model):
     image = ImageWithThumbsField(upload_to='images', sizes=(
         (125, 125), (200, 200)))  # models.FileField(upload_to='images', blank=True, null=True)
     date = models.DateField(default=date.today)
-    status = models.CharField(max_length=10, default='Unresolved', choices=STATUS_CHOICES)
     published_date = models.DateTimeField(
         blank=True, null=True)
 
     def __str__(self):
         return self.title
+
 
 
 class UserProfile(models.Model):
