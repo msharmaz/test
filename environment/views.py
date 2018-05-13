@@ -315,6 +315,49 @@ def post_detail(request, pk):
     }
     return render(request, template, context)
 
+
+def edit_post(request, pk):
+    template = 'create_post.html'
+    post = get_object_or_404(Post, pk=pk)
+
+    if request.method == 'POST':
+        post_form = PostForm(request.POST, instance=post)
+
+        try:
+            if post_form.is_valid():
+                post_form.save()
+                messages.success(request, "Your Blog Post Was Successfully Updated")
+
+        except Exception as e:
+            messages.warning(request, 'Your Post Was Not Saved Due To An Error: {}'.format(e))
+
+    else:
+        post_form = PostForm(instance=post)
+
+    context = {
+        'post_form': post_form,
+        'post': post,
+    }
+    return render(request, template, context)
+
+
+def post_list_admin(request):
+    template = 'post_list_admin.html'
+
+    post = Post.objects.all()
+
+    # pages = pagination(request, post, 5)
+
+    context = {
+        # 'items': pages[0],
+        # 'page_range': pages[1]
+        'post': post
+    }
+    return render(request, template, context)
+
+
+
+
 # def search(request):
 #     # obj1 = Post.objects.all().order_by('published_date')
 # 	#some_category = Category.objects.get(category_name="SOMETHING")

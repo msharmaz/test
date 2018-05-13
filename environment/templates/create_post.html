@@ -1,24 +1,64 @@
 {% extends 'index.html' %}
 
 {% block content %}
-
-    <form id="post_form" method="post" enctype="multipart/form-data" xmlns="http://www.w3.org/1999/html">
-
-        {% csrf_token %}
-
-        <!-- Display each form. The as_p method wraps each element in a paragraph
-             (<p>) element. This ensures each element appears on a new line,
-             making everything look neater. -->
-        <div class="id">
-        <table>
-        {{ post_form.as_table }}
-        </table>
-
-{#        {{ profile_form.as_p }}#}
-
-        <!-- Provide a button to click to submit the form. -->
-        <input type="submit" name="submit" value="Register" />
-            </div>
-    </form>
-
+<div class="offset-3 col-md-6">
+    {% with url_name=request.resolver_match.url_name %}
+        {% if url_name == 'create' %}
+            <h2>Add A New Post</h2>
+        {% elif url_name == 'edit_post' %}
+            <h2>Edit Post: {{post}}</h2>
+        {% endif %}
+    {% endwith %}
+{% if messages %}
+    {% for message in messages %}
+        <div {% if message.tags %} class="alert alert-{{ message.tags }}" {% endif %} role="alert">
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <strong>{{ message }}</strong>
+        </div>
+    {% endfor %}
+{% else %}
+<form method="post">{% csrf_token %}
+    <div class="form-group">
+        {% for field in post_form %}
+        <label>{{field.label_tag}}</label>
+        {{field}}
+        {% endfor %}
+    </div>
+    {% with url_name=request.resolver_match.url_name %}
+        {% if url_name == 'create' %}
+            <button class="btn btn-success" type="submit">Save</button>
+        {% elif url_name == 'edit_post' %}
+            <button class="btn btn-warning" type="submit">Update</button>
+        {% endif %}
+    {% endwith %}
+</form>
+</div>
+{% endif %}
 {% endblock %}
+
+
+
+
+{##}
+{#{% block content %}#}
+{##}
+{#    <form id="post_form" method="post" enctype="multipart/form-data" xmlns="http://www.w3.org/1999/html">#}
+{##}
+{#        {% csrf_token %}#}
+{##}
+{#        <!-- Display each form. The as_p method wraps each element in a paragraph#}
+{#             (<p>) element. This ensures each element appears on a new line,#}
+{#             making everything look neater. -->#}
+{#        <div class="id">#}
+{#        <table>#}
+{#        {{ post_form.as_table }}#}
+{#        </table>#}
+{##}
+{#        {{ profile_form.as_p }}#}
+{##}
+{#        <!-- Provide a button to click to submit the form. -->#}
+{#        <input type="submit" name="submit" value="Register" />#}
+{#            </div>#}
+{#    </form>#}
+{##}
+{#{% endblock %}#}

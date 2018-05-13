@@ -72,16 +72,6 @@ WSGI_APPLICATION = 'website.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'Website',
-#         'USER': 'root',
-#         'PASSWORD': 'Commercial3',
-#         'HOST': 'localhost',
-#         'PORT': '',
-#     }
-# }
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',

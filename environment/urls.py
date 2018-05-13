@@ -34,4 +34,6 @@ urlpatterns = [
     url(r'^add_category/$', views.add_category, name='add_category'),  # NEW MAPPING!
     url(r'^add_status/$', views.add_status, name='add_status'),  # NEW MAPPING!
     # url(r'^category/(?P<category_name_url>\w+)$', views.category, name='category'),
+    url(r'^edit-post/(?P<pk>\d+)/$', views.edit_post, name='edit_post'),
+    url(r'^post-list/$', views.post_list_admin, name='post_list_admin'),
 ]
