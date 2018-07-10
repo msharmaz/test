@@ -1,0 +1,36 @@
+{% extends 'index.html' %}
+
+{% block content %}
+<table class="table">
+    <thead class="thead-dark">
+        <tr>
+            <th scope="col">PK</th>
+            <th scope="col">Title</th>
+            <th scope="col">Description</th>
+            <th scope="col">City</th>
+            <th scope="col">State</th>
+            <th scope="col">Category</th>
+            <th scope="col">Date</th>
+            <th scope="col">User</th>
+            <th scope="col">Edit</th>
+            <th scope="col">Delete</th>
+        </tr>
+    </thead>
+        {% for item in post %}
+         <tr>
+        <td>{{item.pk}}</td>
+        <td>{{item.title}}</td>
+        <td>{{item.description}}</td>
+        <td>{{item.city}}</td>
+        <td>{{item.state}}</td>
+        <td>{{item.category}}</td>
+        <td>{{item.date}}</td>
+        <td>{{item.user}}</td>
+{#    <td>{% if item.seo_title %}Yes{% else %}No{% endif %}</td>#}
+{#    <td>{% if item.seo_description %}Yes{% else %}No{% endif %}</td>#}
+    <td><a href="{% url 'edit_post' pk=item.pk %}"><button class="btn btn-warning">Edit</button></a></td>
+    <td><button class="btn btn-danger">Delete</button></td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
