@@ -11,7 +11,7 @@ only staff can see certainpage<br>
 First, clone the repository to your local machine:
 
 ```bash
-git clone https://github.com/sibtc/django-multiple-user-types-example.git
+git clone https://github.com/msharmaz/test.git
 ```
 
 Install the requirements:
