@@ -26,14 +26,16 @@
 
             {% for field in user_form.visible_fields %}
             {{ field.errors }}
+	    {{ field.label }}
+	    {{ field }}
             {{ field.help_text }}<br />
-            {{ field }}<br />
             {% endfor %}
 
             {% for field in profile_form.visible_fields %}
             {{ field.errors }}
+	    {{ field.label }}
+            {{ field }}
             {{ field.help_text }}<br />
-            {{ field }}<br />
             {% endfor %}
 
             <br />

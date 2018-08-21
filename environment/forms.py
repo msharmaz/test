@@ -11,15 +11,28 @@ class UserForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['username', 'email', 'password']
+'''
+    first_name = forms.CharField(max_length=30, required=False, help_text='Optional.')
+    last_name = forms.CharField(max_length=30, required=False, help_text='Optional.')
+    email = forms.EmailField(max_length=254, help_text='Required. Inform a valid email address.')	
+    birth_date = forms.DateField(help_text='Required. Format: YYYY-MM-DD')
+
+    class Meta:
+        model = User
+        fields = ('username', 'first_name', 'last_name', 'email', 'birth_date', 'password1', 'password2', )
+'''
 
 
 class UserProfileForm(forms.ModelForm):
     website = forms.URLField(help_text="Please enter your website.", required=False)
     picture = forms.ImageField(help_text="Select a profile image to upload.", required=False)
 
+    bio = forms.CharField(help_text="Please enter your short Bio.", max_length=500, required=False)
+    location = forms.CharField(help_text="Please enter your Location/State.", max_length=30, required=False)
+
     class Meta:
         model = UserProfile
-        fields = ['website', 'picture']
+        fields = ['website', 'picture', 'bio', 'location']
 
 
 class PostForm(forms.ModelForm):
